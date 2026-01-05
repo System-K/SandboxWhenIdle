@@ -13,13 +13,24 @@ void AutoSandboxHandler::Register()
 		logger::info("Registered for load game event");
 	}
 
+	logger::info("Current auto vanity time: {} seconds", "fAutoVanityModeDelay:Camera"_ini.value_or(-1.0f));
+
 	exteriorPackage = RE::TESForm::LookupByEditorID<RE::TESPackage>("SandboxWhenIdleExterior");
 	interiorPackage = RE::TESForm::LookupByEditorID<RE::TESPackage>("SandboxWhenIdleInterior");
-
-	furnitureForceFirstPerson = RE::BGSDefaultObjectManager::GetSingleton()->GetObject<RE::BGSKeyword>(RE::DEFAULT_OBJECT::kKeywordFurnitureForces1stPerson);
-	furnitureForceThirdPerson = RE::BGSDefaultObjectManager::GetSingleton()->GetObject<RE::BGSKeyword>(RE::DEFAULT_OBJECT::kKeywordFurnitureForces3rdPerson);
-	furnitureSpecial = RE::BGSDefaultObjectManager::GetSingleton()->GetObject<RE::BGSKeyword>(RE::DEFAULT_OBJECT::kKeywordSpecialFurniture);
 	resetRootIdle = RE::TESForm::LookupByEditorID<RE::TESIdleForm>("ResetRoot");
+
+	if (!exteriorPackage) {
+		logger::error("Could not find SandboxWhenIdleExterior package. Auto sandboxing disabled.");
+		skipSandbox = true;
+	}
+	if (!interiorPackage) {
+		logger::error("Could not find SandboxWhenIdleInterior package. Auto sandboxing disabled.");
+		skipSandbox = true;
+	}
+	if (!resetRootIdle) {
+		logger::error("Could not find ResetRoot idle. Auto sandboxing disabled.");
+		skipSandbox = true;
+	}
 
 	improvedCameraInstalled = GetModuleHandle(L"ImprovedCameraSE.dll") != nullptr;
 }
@@ -31,19 +42,26 @@ bool AutoSandboxHandler::IsAutoSandboxing() const
 
 bool AutoSandboxHandler::CanSandbox() const
 {
-	if (!registeredForInput || sandboxCheckFailed) {
+	if (!registeredForInput || skipSandbox || sandboxCheckFailed) {
 		return false;
 	}
 
 	const auto player = RE::PlayerCharacter::GetSingleton();
-	if (!player->currentProcess || player->IsDead() || player->IsInCombat() || player->IsSneaking() || player->IsOnMount() || !player->GetPlayerControls()) {
+	if (!player->currentProcess || player->IsDead() || player->IsInCombat() || player->IsSneaking() || player->IsOnMount()) {
 		return false;
 	}
 
 	const auto controlMap = RE::ControlMap::GetSingleton();
-	if (controlMap && (!controlMap->IsMovementControlsEnabled() || !controlMap->IsFightingControlsEnabled() || !controlMap->IsPOVSwitchControlsEnabled() || !controlMap->IsLookingControlsEnabled() || !controlMap->IsSneakingControlsEnabled() || !controlMap->IsMenuControlsEnabled())) {
-		return false;
-	} 
+	if (controlMap) {
+		if (!controlMap->IsMovementControlsEnabled() ||
+			!controlMap->IsFightingControlsEnabled() ||
+			!controlMap->IsPOVSwitchControlsEnabled() ||
+			!controlMap->IsLookingControlsEnabled() ||
+			!controlMap->IsSneakingControlsEnabled() ||
+			!controlMap->IsMenuControlsEnabled()) {
+			return false;
+		}
+	}
 
 	const auto processLists = RE::ProcessLists::GetSingleton();
 	if (processLists && processLists->AreHostileActorsNear(nullptr)) {

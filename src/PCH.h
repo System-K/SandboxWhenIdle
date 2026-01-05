@@ -6,9 +6,9 @@
 
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
+#include "REX/REX/Singleton.h"
 
 #include <ClibUtil/simpleINI.hpp>
-#include <ClibUtil/singleton.hpp>
 #include <spdlog/sinks/basic_file_sink.h>
 
 #define DLLEXPORT __declspec(dllexport)
@@ -18,7 +18,7 @@ namespace string = clib_util::string;
 namespace ini = clib_util::ini;
 
 using namespace std::literals;
-using namespace clib_util::singleton;
+using namespace RE::literals;
 
 namespace stl
 {
@@ -41,8 +41,6 @@ namespace stl
 	void write_thunk_call(std::uintptr_t a_src)
 	{
 		auto& trampoline = SKSE::GetTrampoline();
-		SKSE::AllocTrampoline(14);
-
 		T::func = trampoline.write_call<5>(a_src, T::thunk);
 	}
 }

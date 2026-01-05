@@ -71,10 +71,11 @@ namespace Hooks
 
 	void Install()
 	{
-		AutoStartVanityMode::Install();
+		SKSE::AllocTrampoline(14*3);
 
 		stl::write_vfunc<RE::AutoVanityState, AutoVanityStateEnd>();
-
+		
+		AutoStartVanityMode::Install();
 		CanInteractWith::Install();
 		IsAnOwner::Install();
 	}
