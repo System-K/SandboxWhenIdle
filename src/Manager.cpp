@@ -57,15 +57,8 @@ bool AutoSandboxHandler::CanSandbox() const
 	}
 
 	const auto controlMap = RE::ControlMap::GetSingleton();
-	if (controlMap) {
-		if (!controlMap->IsMovementControlsEnabled() ||
-			!controlMap->IsFightingControlsEnabled() ||
-			!controlMap->IsPOVSwitchControlsEnabled() ||
-			!controlMap->IsLookingControlsEnabled() ||
-			!controlMap->IsSneakingControlsEnabled() ||
-			!controlMap->IsMenuControlsEnabled()) {
-			return false;
-		}
+	if (controlMap && (!controlMap->IsMovementControlsEnabled() || !controlMap->IsLookingControlsEnabled())) {
+		return false;
 	}
 
 	const auto processLists = RE::ProcessLists::GetSingleton();
