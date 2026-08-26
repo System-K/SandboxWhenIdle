@@ -22,19 +22,18 @@ void AutoSandboxHandler::Register()
 	if (!exteriorPackage) {
 		REX::ERROR("Could not find SandboxWhenIdleExterior package. Auto sandboxing disabled.");
 		skipSandbox = true;
+	} else {
+		REX::INFO("Found SandboxWhenIdleExterior package.");
 	}
 	if (!interiorPackage) {
 		REX::ERROR("Could not find SandboxWhenIdleInterior package. Auto sandboxing disabled.");
 		skipSandbox = true;
+	} else {
+		REX::INFO("Found SandboxWhenIdleInterior package.");
 	}
 	if (!resetRootIdle) {
 		REX::ERROR("Could not find ResetRoot idle. Auto sandboxing disabled.");
 		skipSandbox = true;
-	}
-
-	if (!skipSandbox) {
-		REX::INFO("Found SandboxWhenIdleExterior package.");
-		REX::INFO("Found SandboxWhenIdleInterior package.");
 	}
 
 	improvedCameraInstalled = REX::W32::GetModuleHandleA("ImprovedCameraSE.dll") != nullptr;
@@ -112,6 +111,8 @@ void AutoSandboxHandler::StopSandbox()
 
 	SetHeadTracking(false);
 	UpdateCameraForSandbox(false);
+
+	ResetSandboxCheck();
 }
 
 void AutoSandboxHandler::ResetSandboxCheck()
@@ -195,6 +196,8 @@ RE::BSEventNotifyControl AutoSandboxHandler::ProcessEvent(const RE::TESLoadGameE
 	if (IsAutoSandboxing()) {
 		StopSandbox();
 	}
+
+	ResetSandboxCheck();
 
 	return RE::BSEventNotifyControl::kContinue;
 }
