@@ -71,8 +71,6 @@ namespace Hooks
 
 	void Install()
 	{
-		SKSE::AllocTrampoline(14*3);
-
 		stl::write_vfunc<RE::AutoVanityState, AutoVanityStateEnd>();
 		
 		AutoStartVanityMode::Install();

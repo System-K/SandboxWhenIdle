@@ -1,7 +1,7 @@
 #pragma once
 
 class AutoSandboxHandler :
-	public REX::Singleton<AutoSandboxHandler>,
+	public REX::TSingleton<AutoSandboxHandler>,
 	public RE::BSTEventSink<RE::InputEvent*>,
 	public RE::BSTEventSink<RE::TESLoadGameEvent>
 {

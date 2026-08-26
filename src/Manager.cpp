@@ -5,34 +5,39 @@ void AutoSandboxHandler::Register()
 	if (const auto inputMgr = RE::BSInputDeviceManager::GetSingleton()) {
 		inputMgr->AddEventSink<RE::InputEvent*>(this);
 		registeredForInput = true;
-		logger::info("Registered for hotkey event");
+		REX::INFO("Registered for hotkey event");
 	}
 
 	if (auto scripts = RE::ScriptEventSourceHolder::GetSingleton()) {
 		scripts->AddEventSink<RE::TESLoadGameEvent>(this);
-		logger::info("Registered for load game event");
+		REX::INFO("Registered for load game event");
 	}
 
-	logger::info("Current auto vanity time: {} seconds", "fAutoVanityModeDelay:Camera"_ini.value_or(-1.0f));
+	REX::INFO("Current auto vanity time: {} seconds", "fAutoVanityModeDelay:Camera"_ini.value_or(-1.0f));
 
 	exteriorPackage = RE::TESForm::LookupByEditorID<RE::TESPackage>("SandboxWhenIdleExterior");
 	interiorPackage = RE::TESForm::LookupByEditorID<RE::TESPackage>("SandboxWhenIdleInterior");
 	resetRootIdle = RE::TESForm::LookupByEditorID<RE::TESIdleForm>("ResetRoot");
 
 	if (!exteriorPackage) {
-		logger::error("Could not find SandboxWhenIdleExterior package. Auto sandboxing disabled.");
+		REX::ERROR("Could not find SandboxWhenIdleExterior package. Auto sandboxing disabled.");
 		skipSandbox = true;
 	}
 	if (!interiorPackage) {
-		logger::error("Could not find SandboxWhenIdleInterior package. Auto sandboxing disabled.");
+		REX::ERROR("Could not find SandboxWhenIdleInterior package. Auto sandboxing disabled.");
 		skipSandbox = true;
 	}
 	if (!resetRootIdle) {
-		logger::error("Could not find ResetRoot idle. Auto sandboxing disabled.");
+		REX::ERROR("Could not find ResetRoot idle. Auto sandboxing disabled.");
 		skipSandbox = true;
 	}
 
-	improvedCameraInstalled = GetModuleHandle(L"ImprovedCameraSE.dll") != nullptr;
+	if (!skipSandbox) {
+		REX::INFO("Found SandboxWhenIdleExterior package.");
+		REX::INFO("Found SandboxWhenIdleInterior package.");
+	}
+
+	improvedCameraInstalled = REX::W32::GetModuleHandleA("ImprovedCameraSE.dll") != nullptr;
 }
 
 bool AutoSandboxHandler::IsAutoSandboxing() const
@@ -168,7 +173,7 @@ void AutoSandboxHandler::SetHeadTracking(bool a_enable)
 
 RE::TESPackage* AutoSandboxHandler::GetPackage()
 {
-	auto parentCell = RE::PlayerCharacter::GetSingleton()->parentCell;
+	auto parentCell = RE::PlayerCharacter::GetSingleton()->GetParentCell();
 	return parentCell && parentCell->IsInteriorCell() ? interiorPackage : exteriorPackage;
 }
 
