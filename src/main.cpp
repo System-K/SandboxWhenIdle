@@ -1,5 +1,6 @@
 #include "Hooks.h"
 #include "Manager.h"
+#include "Papyrus.h"
 
 void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 {
@@ -19,8 +20,8 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 SKSE_PLUGIN_VERSION = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(REL::Version{ Version::MAJOR, Version::MINOR, Version::PATCH });
-	v.PluginName("Sandbox When Idle");
-	v.AuthorName("powerofthree");
+	v.PluginName("SandboxControl");
+	v.AuthorName("powerofthree - NSA edition by Preguissoso, 1.7.104 rebuild");
 	v.UsesAddressLibrary();
 	v.UsesUpdatedStructs();
 	v.CompatibleVersions({ SKSE::RUNTIME_SSE_LATEST });
@@ -78,6 +79,8 @@ SKSE_PLUGIN_LOAD(const SKSE::LoadInterface* a_skse)
 		}
 	}
 #endif
+
+	SKSE::GetPapyrusInterface()->Register(Papyrus::Register);
 
 	const auto messaging = SKSE::GetMessagingInterface();
 	messaging->RegisterListener(MessageHandler);

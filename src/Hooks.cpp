@@ -73,7 +73,7 @@ namespace Hooks
 	{
 		stl::write_vfunc<RE::AutoVanityState, AutoVanityStateEnd>();
 		
-		AutoStartVanityMode::Install();
+		// AutoStartVanityMode::Install();  // NSA edition: sandboxing is started from Papyrus only
 		CanInteractWith::Install();
 		IsAnOwner::Install();
 	}
